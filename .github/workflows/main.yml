@@ -1,0 +1,42 @@
+name: Memos Build
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Clone Memos
+      run: git clone https://github.com/usememos/memos.git
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '18.12.1'
+
+    - name: Build frontend
+      run: |
+        cd memos/web
+        npm install -g pnpm
+        pnpm i --frozen-lockfile
+        pnpm build
+        mv dist ../server/
+
+    - name: Setup Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: '1.19.3'
+
+    - name: Build backend
+      run: |
+        cd memos
+        go build -o memos ./main.go
+
+    # 在这里，您可以添加将构建产物上传到您所需目标位置的步骤
