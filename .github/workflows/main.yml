@@ -7,7 +7,24 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        goarch: [amd64, arm64]
+        include:
+          - os: windows-latest
+            goos: windows
+            goarch: amd64
+            cgo_env: CC=x86_64-w64-mingw32-gcc
+          - os: windows-latest
+            goos: windows
+            goarch: arm64
+            cgo_env: CC=aarch64-w64-mingw32-gcc
+    env:
+      GOOS: ${{ matrix.goos }}
+      GOARCH: ${{ matrix.goarch }}
+      CGO_ENABLED: 1
 
     steps:
     - name: Checkout repository
@@ -35,13 +52,19 @@ jobs:
       with:
         go-version: '1.19.3'
 
+    - name: Install mingw-w64 (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        choco install mingw
+        echo ${{ matrix.cgo_env }} >> $GITHUB_ENV
+
     - name: Build backend
       run: |
         cd memos
-        go build -o memos ./main.go
+        go build -o memos-${GOOS}-${GOARCH} ./main.go
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: memos-binary
-        path: memos/memos
-    # 在这里，您可以添加将构建产物上传到您所需目标位置的步骤
+        name: memos-binary-${{ matrix.os }}-${{ matrix.goarch }}
+        path: memos/memos-${{ matrix.GOOS }}-${{ matrix.GOARCH }}
