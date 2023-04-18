@@ -39,5 +39,9 @@ jobs:
       run: |
         cd memos
         go build -o memos ./main.go
-
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: memos-binary
+        path: memos/memos
     # 在这里，您可以添加将构建产物上传到您所需目标位置的步骤
