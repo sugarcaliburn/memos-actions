@@ -49,7 +49,7 @@ jobs:
         Remove-Item -Path ../server/dist -Recurse -Force
         mv dist ../server/
 
-    - name: Build frontend (non-Windows)
+    - name: Build frontend (non-Windows2)
       if: matrix.os != 'windows-latest'
       run: |
         cd memos/web
