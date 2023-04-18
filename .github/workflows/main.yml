@@ -44,7 +44,7 @@ jobs:
         npm install -g pnpm
         pnpm i --frozen-lockfile
         pnpm build
-        if (${{ matrix.os }} -eq 'windows-latest') {
+        if ("${{ matrix.os }}" -eq "windows-latest") {
           Remove-Item -Path ../server/dist -Recurse -Force
         } else {
           rm -rf ../server/dist
